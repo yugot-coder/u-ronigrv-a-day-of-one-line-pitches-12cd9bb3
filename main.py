@@ -35,8 +35,15 @@ def main() -> None:
     assert entry.strip() == entry
     out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
     os.makedirs(out_dir, exist_ok=True)
-    with open(os.path.join(out_dir, "entry.txt"), "w", encoding="utf-8") as f:
+    out_path = os.path.join(out_dir, "entry.txt")
+    with open(out_path, "w", encoding="utf-8") as f:
         f.write(entry)
+    # Read-back verification: the file on disk must be exactly the
+    # selected pitch, byte for byte, or the run fails loudly.
+    with open(out_path, "r", encoding="utf-8") as f:
+        written = f.read()
+    if written != entry:
+        raise SystemExit("read-back mismatch: entry.txt != selected pitch")
 
 
 if __name__ == "__main__":
